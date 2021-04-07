@@ -12,7 +12,7 @@ class Client(object):
     """Client is the client to access the API of BiggerYun."""
 
     def __init__(self, signature_key, user_id, local_id="wuxi", project_id="0",
-                 host="https://api2.biggeryun.com", thread_safe=True,
+                 host="https://api2.biggeryun.com", post=False, thread_safe=True,
                  encoding="utf-8", timeout=None, version="v1"):
         """Create a new BiggerYun client.
 
