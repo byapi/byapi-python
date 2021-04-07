@@ -12,7 +12,7 @@ class Client(object):
     """Client is the client to access the API of BiggerYun."""
 
     def __init__(self, signature_key, user_id, local_id="wuxi", project_id="0",
-                 host="https://api.biggeryun.com", post=False, thread_safe=True,
+                 host="https://api2.biggeryun.com", thread_safe=True,
                  encoding="utf-8", timeout=None, version="v1"):
         """Create a new BiggerYun client.
 
@@ -22,14 +22,12 @@ class Client(object):
         @param project_id(string): The project ID, such as "0", "1", etc,
                                    which is the default project by default.
         @param host(string): The host or ip of the BiggerYun API.
-        @param post(string): If true, use POST, not GET.
         @param thread_safe(bool): If true, the apis will use the thread lock to
                                   ensure the api call is thread-safe.
         @param encoding(string): the encoding of the request content.
         """
         self._host = host.strip("/")
         self._version = version
-        self._is_post = post
         self._local_id = local_id
         self._project_id = project_id
         self._thread_safe = thread_safe
@@ -42,13 +40,11 @@ class Client(object):
         self._request_url = self._host + "/" + self._version
         self._lock = Lock()
 
-        if self._is_post:
-            self._send_request = lambda url, data: requests.post(url, json=data)
-        else:
-            self._send_request = lambda url, data: requests.get(url, params=data)
-
         if signature_key and not user_id:
             raise ValueError("must give user_id when using signature")
+
+    def _send_request(self, url, data):
+        return requests.get(url, params=data)
 
     def _get_lock(self):
         if self._thread_safe:
@@ -82,16 +78,23 @@ class Client(object):
         signature_key = self._authorization
         self._put_lock()
 
+        _kwargs = {}
         for key, value in kwargs.items():
-            if is_string(value):
-                kwargs[key] = to_unicode(value, self._encoding)
+            if value is None:
+                continue
+            elif is_string(value):
+                _kwargs[key] = to_unicode(value, self._encoding)
             elif isinstance(value, bool):
-                kwargs[key] = "true" if value else "false"
+                _kwargs[key] = "true" if value else "false"
+            elif isinstance(value, (list, tuple)):
+                _kwargs[key] = to_unicode(json.dumps(value), self._encoding)
+            else:
+                _kwargs[key] = value
 
-        kwargs["Signature"] = self._get_signature(kwargs, signature_key)
+        _kwargs["Signature"] = self._get_signature(_kwargs, signature_key)
         url = self._request_url + "/" + action
 
-        return self._get_result(self._send_request(url, kwargs))
+        return self._get_result(self._send_request(url, _kwargs))
 
     def _get_result(self, resp):
         if resp.content:
