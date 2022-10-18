@@ -8,8 +8,8 @@ from byapi.utils import datetime2str
 class VMClient(Client):
     def create(self, vm_name, password, security_group_id, image_id, os_type,
                cpu=2, memory=4, vm_num=1, bandwidth=None, data_disk_size=None,
-               count_type="month", number=1, note="", auto_renew=False,
-               shbw_id=None, execute_time=None, project_id=None):
+               count_type="month", number=1, auto_renew=False, application="vm",
+               note="", shbw_id=None, execute_time=None, project_id=None):
         """Create a new VM.
 
         @param vm_name(string): The name of VM.
@@ -32,6 +32,7 @@ class VMClient(Client):
         @param shbw_id(string): the id of the shared bandwidth.
         @param execute_time(datetime): The datetime to delete automatically.
         @param project_id(string): The project id. If not given, use the default.
+        @param application(string): The vm type, such as vm,general_vm,io_vm,hpc_vm,hpc_uvm,bd_vm,hz_vm
 
         @retrun(dict):
             @key(string): The VM ID.
@@ -59,6 +60,7 @@ class VMClient(Client):
             "Number": number,
             "VM_Num": vm_num,
             "Auto_Renew": auto_renew,
+            "Application": application,
         }
 
         if bandwidth:
