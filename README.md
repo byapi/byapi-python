@@ -8,4 +8,4 @@ The doc see [here](http://help.biggeryun.com/).
 
 SDK Version | API Version
 ------------|------------
-v1.2.0      | v1.2
+v1.2.X      | v1.2

@@ -1,7 +1,7 @@
 from setuptools import setup
 
 package = "byapi"
-version = "1.2.0"
+version = "1.2.1"
 
 
 def read_file(filename):
